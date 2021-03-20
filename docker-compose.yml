@@ -7,6 +7,8 @@ networks:
     driver: ${NETWORKS_DRIVER}
 
 volumes:
+  grafana_data: { }
+  influxdb_data: { }
   mysql:
     driver: ${VOLUMES_DRIVER}
   percona:
@@ -1126,15 +1128,15 @@ services:
         - backend
 
 ### Grafana ################################################
-    grafana:
-      build:
-        context: ./grafana
-      volumes:
-        - ${DATA_PATH_HOST}/grafana:/var/lib/grafana
-      ports:
-        - "${GRAFANA_PORT}:3000"
-      networks:
-        - backend
+#    grafana:
+#      build:
+#        context: ./grafana
+#      volumes:
+#        - ${DATA_PATH_HOST}/grafana:/var/lib/grafana
+#      ports:
+#        - "${GRAFANA_PORT}:3000"
+#      networks:
+#        - backend
 
 ### Graylog #######################################
     graylog:
@@ -1904,4 +1906,51 @@ services:
       volumes:
         - ./react:/usr/src/app/react
         - /usr/src/app/react/node_modules
+
+### ITG ###############
+
+    telegraf:
+      image: telegraf:1.15-alpine
+      volumes:
+        - ./telegraf/etc/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+        - /var/run/docker.sock:/var/run/docker.sock:ro
+        - /var:/var:ro
+        - /sys:/rootfs/sys:ro
+        - /proc:/rootfs/proc:ro
+        - /etc:/rootfs/etc:ro
+      depends_on:
+        - influxdb
+      links:
+        - influxdb
+      ports:
+        - '127.0.0.1:8125:8125/udp'
+      networks:
+        - backend
+
+    influxdb:
+      image: influxdb:1.8-alpine
+      env_file: configuration.env
+      ports:
+        - '127.0.0.1:8086:8086'
+      volumes:
+        - ./:/imports
+        - influxdb_data:/var/lib/influxdb
+      networks:
+        - backend
+
+    grafana:
+      image: grafana/grafana:7.2.1
+      depends_on:
+        - influxdb
+      env_file: configuration.env
+      links:
+        - influxdb
+      ports:
+        - '127.0.0.1:3030:3000'
+      volumes:
+        - grafana_data:/var/lib/grafana
+        - ./grafana/provisioning/:/etc/grafana/provisioning/
+        - ./grafana/dashboards/:/var/lib/grafana/dashboards/
+      networks:
+        - backend
 
