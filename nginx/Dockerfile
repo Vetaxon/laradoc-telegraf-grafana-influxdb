@@ -1,10 +1,6 @@
 FROM nginx:alpine
 
-LABEL maintainer="Mahmoud Zalt <mahmoud@zalt.me>"
-
 COPY nginx.conf /etc/nginx/
-
-# If you're in China, or you need to change sources, will be set CHANGE_SOURCE to true in .env.
 
 ARG CHANGE_SOURCE=false
 RUN if [ ${CHANGE_SOURCE} = true ]; then \
@@ -29,6 +25,7 @@ ARG PHP_UPSTREAM_PORT=9000
 
 # Create 'messages' file used from 'logrotate'
 RUN touch /var/log/messages
+RUN mkdir -p /etc/nginx_cache
 
 # Copy 'logrotate' config file
 COPY logrotate/nginx /etc/logrotate.d/

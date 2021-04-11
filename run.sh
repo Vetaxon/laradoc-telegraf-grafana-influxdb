@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker-compose up nginx mysql redis elasticsearch mongo telegraf grafana influxdb
+docker-compose up -d nginx mysql redis elasticsearch mongo telegraf grafana influxdb
