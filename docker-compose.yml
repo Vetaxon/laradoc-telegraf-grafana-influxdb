@@ -665,8 +665,13 @@ services:
 ### Redis Cluster ##########################################
     redis-cluster:
       build: ./redis-cluster
+      volumes:
+        - ${DATA_PATH_HOST}/redis-cluster:/data
+      environment:
+        MASTERS: ${REDIS_CLUSTER_MASTERS}
+        SLAVES_PER_MASTER: ${REDIS_CLUSTER_SLAVES_PER_MASTER}
       ports:
-        - "${REDIS_CLUSTER_PORT_RANGE}:7000-7005"
+        - "${REDIS_CLUSTER_PORT_RANGE}:${REDIS_CLUSTER_PORT_RANGE}"
       networks:
         - backend
 

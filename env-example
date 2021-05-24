@@ -370,6 +370,8 @@ REDIS_PORT=6379
 ### REDIS CLUSTER #########################################
 
 REDIS_CLUSTER_PORT_RANGE=7000-7005
+REDIS_CLUSTER_MASTERS=1
+REDIS_CLUSTER_SLAVES_PER_MASTER=5
 
 ### ZooKeeper #############################################
 
